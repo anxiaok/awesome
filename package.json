@@ -1,0 +1,29 @@
+{
+  "name": "awesome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "dist": "vuepress build docs",
+    "deploy": "npm run dist && gh-pages -d docs/.vuepress/dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anxiaok/awesome.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anxiaok/awesome/issues"
+  },
+  "homepage": "https://github.com/anxiaok/awesome#readme",
+  "devDependencies": {
+    "@vuepress/bundler-vite": "^2.0.0-rc.26",
+    "@vuepress/theme-default": "^2.0.0-rc.26",
+    "gh-pages": "^6.3.0",
+    "sass-embedded": "^1.97.3",
+    "vuepress": "^2.0.0-rc.26"
+  }
+}
