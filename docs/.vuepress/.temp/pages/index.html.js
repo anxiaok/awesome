@@ -1,16 +1,3 @@
 import comp from "/Users/anxiaokai/Desktop/study/awesome/docs/.vuepress/.temp/pages/index.html.vue"
-const data = JSON.parse("{\"path\":\"/\",\"title\":\"\",\"lang\":\"en-US\",\"frontmatter\":{},\"git\":{},\"filePathRelative\":\"README.md\"}")
+const data = JSON.parse("{\"path\":\"/\",\"title\":\"\",\"lang\":\"zh-CN\",\"frontmatter\":{\"home\":true,\"heroImage\":\"/keepLearning.gif\",\"heroText\":\"KEEP LEARNING\",\"tagline\":\"苟日新，日日新，又日新\",\"actions\":[{\"text\":\"Let's go\",\"link\":\"/awesomes\",\"type\":\"primary\"}],\"footer\":null},\"git\":{\"updatedTime\":1769572870000,\"contributors\":[{\"name\":\"安晓凯\",\"username\":\"\",\"email\":\"xiaokai.an@17zuoye.com\",\"commits\":1},{\"name\":\"Claude Sonnet 4.5\",\"username\":\"\",\"email\":\"noreply@anthropic.com\",\"commits\":1}],\"changelog\":[{\"hash\":\"87994036ef9e3bc0b012915f2f3c78e1d560d2fd\",\"time\":1769572870000,\"email\":\"xiaokai.an@17zuoye.com\",\"author\":\"安晓凯\",\"message\":\"Initial commit: VuePress project setup\",\"coAuthors\":[{\"name\":\"Claude Sonnet 4.5\",\"email\":\"noreply@anthropic.com\"}]}]},\"filePathRelative\":\"README.md\"}")
 export { comp, data }
-
-if (import.meta.webpackHot) {
-  import.meta.webpackHot.accept()
-  if (__VUE_HMR_RUNTIME__.updatePageData) {
-    __VUE_HMR_RUNTIME__.updatePageData(data)
-  }
-}
-
-if (import.meta.hot) {
-  import.meta.hot.accept(({ data }) => {
-    __VUE_HMR_RUNTIME__.updatePageData(data)
-  })
-}
