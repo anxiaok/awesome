@@ -8,6 +8,8 @@ export default defineUserConfig({
   bundler: viteBundler(),
   theme: defaultTheme({
     navbar: require('./links/nav.js'),
+    contributors: false,
+    lastUpdated: false
   }),
   lang: 'zh-CN',
   title: '持续学习',
