@@ -4,6 +4,10 @@ module.exports = [
     link: '/linux',
   },
   {
+    text: 'redis',
+    link: '/redis',
+  },
+  {
     text: 'react',
     link: '/react',
   },
