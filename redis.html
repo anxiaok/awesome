@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="VuePress 2.0.0-rc.26" />
+    <style>
+      :root {
+        --vp-c-bg: #fff;
+      }
+
+      [data-theme='dark'] {
+        --vp-c-bg: #1b1b1f;
+      }
+
+      html,
+      body {
+        background-color: var(--vp-c-bg);
+      }
+    </style>
+    <script>
+      const useChoice = localStorage.getItem('vuepress-color-scheme')
+      const systemStatus =
+        'matchMedia' in window
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false
+
+      if (useChoice === 'light') {
+        document.documentElement.dataset.theme = 'light'
+      } else if (useChoice === 'dark' || systemStatus) {
+        document.documentElement.dataset.theme = 'dark'
+      }
+    </script>
+    <title>初识Redis | 持续学习</title><meta name="description" content="">
+    <link rel="preload" href="/awesome/assets/style-BGENxIcb.css" as="style"><link rel="stylesheet" href="/awesome/assets/style-BGENxIcb.css">
+    <link rel="modulepreload" href="/awesome/assets/app-DvL9NwtO.js"><link rel="modulepreload" href="/awesome/assets/redis.html-D_p5nRjg.js">
+    <link rel="prefetch" href="/awesome/assets/index.html-BwLrGq8K.js" as="script"><link rel="prefetch" href="/awesome/assets/blogs.html-BalLRweN.js" as="script"><link rel="prefetch" href="/awesome/assets/linux.html-D9Ag4mgV.js" as="script"><link rel="prefetch" href="/awesome/assets/react.html-DLYznHCa.js" as="script"><link rel="prefetch" href="/awesome/assets/404.html-QBSBAsEz.js" as="script">
+  </head>
+  <body>
+    <div id="app"><!--[--><div class="vp-theme-container external-link-icon" vp-container><!--[--><header class="vp-navbar" vp-navbar><div class="vp-toggle-sidebar-button" title="toggle sidebar" aria-expanded="false" role="button" tabindex="0"><div class="icon" aria-hidden="true"><span></span><span></span><span></span></div></div><span><a class="route-link" href="/awesome/"><!----><span class="vp-site-name" aria-hidden="true">持续学习</span></a></span><div class="vp-navbar-items-wrapper" style=""><!--[--><!--]--><nav class="vp-navbar-items vp-hide-mobile" aria-label="site navigation"><!--[--><div class="vp-navbar-item"><a class="route-link auto-link" href="/awesome/linux.html" aria-label="linux"><!--[--><!--[--><!--]--><!--]-->linux<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="route-link route-link-active auto-link" href="/awesome/redis.html" aria-label="redis"><!--[--><!--[--><!--]--><!--]-->redis<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="route-link auto-link" href="/awesome/react.html" aria-label="react"><!--[--><!--[--><!--]--><!--]-->react<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="auto-link external-link" href="https://github.com/ziyi2/awesome" aria-label="子弈" rel="noopener noreferrer" target="_blank"><!--[--><!--[--><!--]--><!--]-->子弈<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="auto-link external-link" href="https://github.com/anxiaok/awesome" aria-label="GitHub" rel="noopener noreferrer" target="_blank"><!--[--><!--[--><!--]--><!--]-->GitHub<!--[--><!--[--><!--]--><!--]--></a></div><!--]--></nav><!--[--><!--]--><button type="button" class="vp-toggle-color-mode-button" title="toggle color mode"><svg class="light-icon" viewbox="0 0 32 32" style=""><path d="M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6z" fill="currentColor"></path><path d="M5.394 6.813l1.414-1.415l3.506 3.506L8.9 10.318z" fill="currentColor"></path><path d="M2 15.005h5v2H2z" fill="currentColor"></path><path d="M5.394 25.197L8.9 21.691l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 25.005h2v5h-2z" fill="currentColor"></path><path d="M21.687 23.106l1.414-1.415l3.506 3.506l-1.414 1.414z" fill="currentColor"></path><path d="M25 15.005h5v2h-5z" fill="currentColor"></path><path d="M21.687 8.904l3.506-3.506l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 2.005h2v5h-2z" fill="currentColor"></path></svg><svg class="dark-icon" viewbox="0 0 32 32" style="display:none;"><path d="M13.502 5.414a15.075 15.075 0 0 0 11.594 18.194a11.113 11.113 0 0 1-7.975 3.39c-.138 0-.278.005-.418 0a11.094 11.094 0 0 1-3.2-21.584M14.98 3a1.002 1.002 0 0 0-.175.016a13.096 13.096 0 0 0 1.825 25.981c.164.006.328 0 .49 0a13.072 13.072 0 0 0 10.703-5.555a1.01 1.01 0 0 0-.783-1.565A13.08 13.08 0 0 1 15.89 4.38A1.015 1.015 0 0 0 14.98 3z" fill="currentColor"></path></svg></button><form class="search-box" role="search"><input type="search" placeholder="搜索" autocomplete="off" spellcheck="false" value><!----></form></div></header><!--]--><div class="vp-sidebar-mask"></div><!--[--><aside class="vp-sidebar" vp-sidebar><nav class="vp-navbar-items" aria-label="site navigation"><!--[--><div class="vp-navbar-item"><a class="route-link auto-link" href="/awesome/linux.html" aria-label="linux"><!--[--><!--[--><!--]--><!--]-->linux<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="route-link route-link-active auto-link" href="/awesome/redis.html" aria-label="redis"><!--[--><!--[--><!--]--><!--]-->redis<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="route-link auto-link" href="/awesome/react.html" aria-label="react"><!--[--><!--[--><!--]--><!--]-->react<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="auto-link external-link" href="https://github.com/ziyi2/awesome" aria-label="子弈" rel="noopener noreferrer" target="_blank"><!--[--><!--[--><!--]--><!--]-->子弈<!--[--><!--[--><!--]--><!--]--></a></div><div class="vp-navbar-item"><a class="auto-link external-link" href="https://github.com/anxiaok/awesome" aria-label="GitHub" rel="noopener noreferrer" target="_blank"><!--[--><!--[--><!--]--><!--]-->GitHub<!--[--><!--[--><!--]--><!--]--></a></div><!--]--></nav><!--[--><!--]--><ul class="vp-sidebar-items"><!--[--><li><p tabindex="0" class="vp-sidebar-item vp-sidebar-heading">初识Redis <!----></p><!----></li><!--]--></ul><!--[--><!--]--></aside><!--]--><!--[--><main class="vp-page"><!--[--><!--]--><div vp-content><!--[--><!--]--><div id="content"><h1 id="初识redis" tabindex="-1"><a class="header-anchor" href="#初识redis"><span>初识Redis</span></a></h1><blockquote><p>Redis是一种基于键值对（key-value)的NoSQL数据库；</p></blockquote><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">值可以为：</span>
+<span class="line"><span class="token number">1.</span> <span class="token literal-property property">string</span><span class="token operator">:</span> 字符串</span>
+<span class="line"><span class="token number">2.</span> hash： 哈希</span>
+<span class="line"><span class="token number">3.</span> list： 列表</span>
+<span class="line"><span class="token number">4.</span> <span class="token keyword">set</span>：集合</span>
+<span class="line"><span class="token number">5.</span> zset：有序集合</span>
+<span class="line"><span class="token number">6.</span> Bitmaps：位图</span>
+<span class="line"><span class="token number">7.</span> HyperLogLog：基数统计</span>
+<span class="line"><span class="token number">8.</span> <span class="token constant">GEO</span>：地理信息定位</span>
+<span class="line">等</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2 id="特性" tabindex="-1"><a class="header-anchor" href="#特性"><span>特性</span></a></h2><ol><li>速度快：存在内存中；C语言实现；单线程架构</li><li>基于键值对的数据结构服务器</li><li>丰富的功能 <ul><li>键过期功能，用来实现缓存</li><li>发布订阅功能给，实现消息系统</li><li>lua脚本，创造新的Redis命令</li><li>事务功能，保证事务特性</li><li>流水线功能（pipeline）,一批命令一次性传递到Redis,减少网络开销</li></ul></li><li>简单稳定</li><li>客户端语言多</li><li>持久化： RDB和AOF</li><li>主从复制</li><li>高可用和分布式</li></ol><h2 id="应用场景" tabindex="-1"><a class="header-anchor" href="#应用场景"><span>应用场景</span></a></h2><ol><li>缓存</li><li>排行榜系统</li><li>计数器应用</li><li>社交网络</li><li>消息队列系统：发布订阅和阻塞队列</li></ol><h2 id="安装" tabindex="-1"><a class="header-anchor" href="#安装"><span>安装</span></a></h2><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">wget https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>download<span class="token punctuation">.</span>redis<span class="token punctuation">.</span>io<span class="token operator">/</span>releases<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">6.2</span><span class="token number">.6</span><span class="token punctuation">.</span>tar<span class="token punctuation">.</span>gz</span>
+<span class="line">tar xzf redis<span class="token operator">-</span><span class="token number">6.2</span><span class="token number">.6</span><span class="token punctuation">.</span>tar<span class="token punctuation">.</span>gz</span>
+<span class="line">ln <span class="token operator">-</span>s redis<span class="token operator">-</span><span class="token number">6.2</span><span class="token number">.6</span> redis</span>
+<span class="line">cd redis<span class="token operator">-</span><span class="token number">6.2</span><span class="token number">.6</span></span>
+<span class="line">make</span>
+<span class="line">make install</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><ol><li>下载Redis安装包</li><li>解压安装包</li><li>创建软链接</li><li>进入Redis目录</li><li>编译Redis</li><li>安装Redis</li></ol><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>v</span>
+<span class="line"># 输出：redis<span class="token operator">-</span>cli <span class="token number">6.2</span><span class="token number">.6</span></span>
+<span class="line">redis<span class="token operator">-</span>server</span>
+<span class="line"># 版本：Redis <span class="token number">6.2</span><span class="token number">.6</span></span>
+<span class="line"># 默认端口号：<span class="token number">6379</span></span>
+<span class="line">将配置写到<span class="token operator">/</span>opt<span class="token operator">/</span>redis<span class="token operator">/</span>redis<span class="token punctuation">.</span>conf</span>
+<span class="line"># 启动Redis服务</span>
+<span class="line">redis<span class="token operator">-</span>server <span class="token operator">/</span>opt<span class="token operator">/</span>redis<span class="token operator">/</span>redis<span class="token punctuation">.</span>conf</span>
+<span class="line"></span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>h <span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span> <span class="token operator">-</span>p <span class="token number">6379</span></span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>h <span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span> <span class="token operator">-</span>p <span class="token number">6379</span> <span class="token keyword">get</span> hello</span>
+<span class="line"></span>
+<span class="line">redis<span class="token operator">-</span>cli shutdown nosave <span class="token operator">|</span> save  </span>
+<span class="line"># 关闭Redis服务</span>
+<span class="line"># nosave：不保存数据</span>
+<span class="line"># save：保存数据</span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2 id="版本号" tabindex="-1"><a class="header-anchor" href="#版本号"><span>版本号</span></a></h2><p>版本号第二位为奇数：表示开发版本，可能包含新功能和 bug 修复。 版本号第二位为偶数：表示稳定版本，适合生产环境使用。</p><h1 id="api的理解和使用" tabindex="-1"><a class="header-anchor" href="#api的理解和使用"><span>API的理解和使用</span></a></h1><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">keys <span class="token operator">*</span> # 查看所有键</span>
+<span class="line">dbsize # 查看数据库中键的数量</span>
+<span class="line">exists key # 查看键是否存在</span>
+<span class="line">del key # 删除键</span>
+<span class="line">expire key seconds # 设置键的过期时间，单位为秒 <span class="token operator">-</span><span class="token number">1</span><span class="token operator">:</span> 没有设置过期时间 <span class="token operator">-</span><span class="token number">2</span>：键不存在</span>
+<span class="line">type key # 查看键的数据类型 不存在返回none</span>
+<span class="line">    <span class="token operator">-</span> string</span>
+<span class="line">    <span class="token operator">-</span> hash</span>
+<span class="line">    <span class="token operator">-</span> list</span>
+<span class="line">        <span class="token operator">-</span> linkedlist</span>
+<span class="line">        <span class="token operator">-</span> ziplist</span>
+<span class="line">        <span class="token operator">-</span> quicklist</span>
+<span class="line">        <span class="token operator">-</span> object encoding hello # 查看字符串的编码方式</span>
+<span class="line">    <span class="token operator">-</span> set</span>
+<span class="line">    <span class="token operator">-</span> zset</span>
+<span class="line">ttl key # 查看键的过期时间，单位为秒</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2 id="单线程架构" tabindex="-1"><a class="header-anchor" href="#单线程架构"><span>单线程架构</span></a></h2><p>为什么单线程还能这么快？</p><ol><li>纯内存访问</li><li>非阻塞I/O</li><li>单线程避免了线程切换和竞态产生的消耗</li></ol><h2 id="字符串" tabindex="-1"><a class="header-anchor" href="#字符串"><span>字符串</span></a></h2><p>值：</p><ol><li>字符串： 简单字符串，复杂字符串（JSON，XML）</li><li>数字：整数、浮点数</li><li>二进制：图片。音频，视频，最大不能超过512MB</li></ol><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line"><span class="token keyword">set</span> key value # 设置键值对</span>
+<span class="line">setex key seconds value # 设置键值对并设置过期时间</span>
+<span class="line">setpx key milliseconds value # 设置键值对并设置过期时间，单位为毫秒</span>
+<span class="line">setnx key value # 只有在键不存在时才设置键值对</span>
+<span class="line">setxx key value # 只有在键存在时才设置键值对</span>
+<span class="line">mset key1 value1 key2 value2 key3 value3 # 批量设置键值对</span>
+<span class="line"></span>
+<span class="line"><span class="token keyword">get</span> key # 获取键对应的值</span>
+<span class="line">mget key1 key2 key3 # 批量获取键对应的值</span>
+<span class="line"></span>
+<span class="line">incr key # 键对应的值加<span class="token number">1</span></span>
+<span class="line">incrby key increment # 键对应的值加上指定的增量</span>
+<span class="line">incrbyfloat key increment # 键对应的值加上指定的浮点数增量</span>
+<span class="line">decr key # 键对应的值减<span class="token number">1</span></span>
+<span class="line">decrby key decrement # 键对应的值减去指定的减量</span>
+<span class="line">decrbyfloat key decrement # 键对应的值减去指定的浮点数减量</span>
+<span class="line"></span>
+<span class="line">append key value # 键对应的值后面追加字符串</span>
+<span class="line">strlen key # 键对应的值的长度</span>
+<span class="line">getset key value # 先获取键对应的值，再设置键对应的值</span>
+<span class="line">setrange key offset value # 从指定偏移量开始，用新字符串替换键对应的值的子字符串</span>
+<span class="line">getrange key start end # 获取键对应的值的子字符串，范围为<span class="token punctuation">[</span>start<span class="token punctuation">,</span> end<span class="token punctuation">]</span></span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="内部编码" tabindex="-1"><a class="header-anchor" href="#内部编码"><span>内部编码</span></a></h3><ol><li>int ： 8个字节的长整型</li><li>embstr ： &lt;= 39个字节的字符串</li><li>raw ： &gt; 39个字节的字符串</li></ol><h3 id="典型使用场景" tabindex="-1"><a class="header-anchor" href="#典型使用场景"><span>典型使用场景</span></a></h3><ol><li>缓存： 缓存频繁访问的数据，减少数据库压力</li><li>计数器： 统计网站访问量、用户注册数等</li><li>会话存储： 存储用户会话信息，实现无状态登录</li><li>限速： 控制对某些资源的访问频率，防止滥用</li></ol><h2 id="哈希" tabindex="-1"><a class="header-anchor" href="#哈希"><span>哈希</span></a></h2><ol><li>field-value ： 键值对</li></ol><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">hset key field value # 设置哈希字段的值</span>
+<span class="line">hget key field # 获取哈希字段的值</span>
+<span class="line">hmset key field1 value1 field2 value2 # 批量设置哈希字段的值</span>
+<span class="line">hmget key field1 field2 # 批量获取哈希字段的值</span>
+<span class="line">hincrby key field increment # 哈希字段的值加上指定的增量</span>
+<span class="line">hincrbyfloat key field increment # 哈希字段的值加上指定的浮点数增量</span>
+<span class="line">hdecrby key field decrement # 哈希字段的值减去指定的减量</span>
+<span class="line">hdecrbyfloat key field decrement # 哈希字段的值减去指定的浮点数减量</span>
+<span class="line">hkeys key # 获取哈希所有字段</span>
+<span class="line">hvals key # 获取哈希所有值</span>
+<span class="line">hlen key # 获取哈希字段数量</span>
+<span class="line">hexists key field # 检查哈希字段是否存在</span>
+<span class="line">hdel key field1 field2 # 删除哈希字段</span>
+<span class="line">hgetall key # 获取哈希所有字段和值</span>
+<span class="line">hscan key cursor <span class="token punctuation">[</span><span class="token constant">MATCH</span> pattern<span class="token punctuation">]</span> <span class="token punctuation">[</span><span class="token constant">COUNT</span> count<span class="token punctuation">]</span> # 迭代哈希字段和值</span>
+<span class="line">hstrlen key field # 获取哈希字段值的字符串长度</span>
+<span class="line"></span>
+<span class="line">object encoding key # 获取键的内部编码</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="内部编码-1" tabindex="-1"><a class="header-anchor" href="#内部编码-1"><span>内部编码</span></a></h3><pre><code>1. ziplist ： 压缩列表
+2. hashtable ： 哈希表
+</code></pre><h3 id="使用场景" tabindex="-1"><a class="header-anchor" href="#使用场景"><span>使用场景</span></a></h3><ol><li>会话存储： 存储用户会话信息，实现无状态登录</li><li>点赞收藏： 存储用户点赞和收藏的文章、商品等，方便进行统计分析</li><li>标签系统： 存储文章、用户、商品等的标签，方便进行分类和搜索</li></ol><h2 id="列表" tabindex="-1"><a class="header-anchor" href="#列表"><span>列表</span></a></h2><p>最多可以存储2^32-1个元素</p><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">lpush key value1 value2 value3 # 从列表头插入元素</span>
+<span class="line">rpush key value1 value2 value3 # 从列表尾插入元素</span>
+<span class="line">lpop key # 从列表头弹出元素</span>
+<span class="line">rpop key # 从列表尾弹出元素</span>
+<span class="line">lrange key start end # 获取列表指定范围的元素，范围为<span class="token punctuation">[</span>start<span class="token punctuation">,</span> end<span class="token punctuation">]</span></span>
+<span class="line">llen key # 获取列表长度</span>
+<span class="line">lindex key index # 获取列表指定索引的元素</span>
+<span class="line">lset key index value # 设置列表指定索引的元素</span>
+<span class="line">lrem key count value # 删除列表中指定数量的元素</span>
+<span class="line">ltrim key start end # 修剪列表，保留指定范围的元素，范围为<span class="token punctuation">[</span>start<span class="token punctuation">,</span> end<span class="token punctuation">]</span></span>
+<span class="line">linsert key before<span class="token operator">|</span>after pivot value # 在列表中指定元素前或后插入新元素</span>
+<span class="line">blpop key1 key2 timeout # 从多个列表头弹出元素，阻塞直到有元素弹出或超时</span>
+<span class="line">brpop key1 key2 timeout # 从多个列表尾弹出元素，阻塞直到有元素弹出或超时</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="内部编码-2" tabindex="-1"><a class="header-anchor" href="#内部编码-2"><span>内部编码</span></a></h3><ol><li>linkedlist ： 链表</li><li>ziplist ： 压缩列表</li><li>quicklist ： 快速列表</li></ol><h3 id="使用场景-1" tabindex="-1"><a class="header-anchor" href="#使用场景-1"><span>使用场景</span></a></h3><ol><li>消息队列 <ol><li>队列： 先进先出（FIFO）</li><li>栈： 先进后出（LIFO）</li></ol></li><li>文章列表 <ol><li>文章列表： 存储文章的有序集合，根据发布时间排序</li><li>文章详情： 存储文章的详细信息，包括标题、内容、作者、发布时间等</li></ol></li></ol><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">lpush<span class="token operator">+</span>lpop <span class="token operator">=</span> <span class="token function">Stack</span><span class="token punctuation">(</span>栈<span class="token punctuation">)</span></span>
+<span class="line">rpush<span class="token operator">+</span>rpop <span class="token operator">=</span> <span class="token function">Queue</span><span class="token punctuation">(</span>队列<span class="token punctuation">)</span></span>
+<span class="line">lpush<span class="token operator">+</span>ltrim<span class="token operator">=</span>Capped <span class="token function">Collection</span><span class="token punctuation">(</span>有上限的集合<span class="token punctuation">)</span></span>
+<span class="line">lpush<span class="token operator">+</span>brpop<span class="token operator">=</span>Message <span class="token function">Queue</span><span class="token punctuation">(</span>消息队列<span class="token punctuation">)</span></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2 id="集合" tabindex="-1"><a class="header-anchor" href="#集合"><span>集合</span></a></h2><p>set 保存多个的字符串元素，每个元素都是唯一的，无序的，最多可以存储2^32-1个元素</p><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">sadd key member1 member2 member3 # 向集合添加元素</span>
+<span class="line">smembers key # 获取集合所有元素</span>
+<span class="line">sismember key member # 检查元素是否在集合中</span>
+<span class="line">srem key member1 member2 # 从集合中删除元素</span>
+<span class="line">scard key # 获取集合元素数量</span>
+<span class="line">sinter key1 key2 # 求多个集合的交集</span>
+<span class="line">sunion key1 key2 # 求多个集合的并集</span>
+<span class="line">sdiff key1 key2 # 求多个集合的差集</span>
+<span class="line">srandmember key <span class="token punctuation">[</span>count<span class="token punctuation">]</span> # 随机获取集合中的元素，count 为获取数量，不指定则返回一个元素</span>
+<span class="line">spop key <span class="token punctuation">[</span>count<span class="token punctuation">]</span> # 随机弹出集合中的元素，count 为弹出数量，不指定则弹出一个元素</span>
+<span class="line">sinterstore destination key1 key2 # 求多个集合的交集，并将结果存储到新集合中</span>
+<span class="line">sunionstore destination key1 key2 # 求多个集合的并集，并将结果存储到新集合中</span>
+<span class="line">sdiffstore destination key1 key2 # 求多个集合的差集，并将结果存储到新集合中</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="内部编码-3" tabindex="-1"><a class="header-anchor" href="#内部编码-3"><span>内部编码</span></a></h3><ol><li>intset ： 整数集合</li><li>hashtable ： 哈希表</li></ol><h3 id="使用场景-2" tabindex="-1"><a class="header-anchor" href="#使用场景-2"><span>使用场景</span></a></h3><ol><li>标签系统： 存储文章、用户、商品等的标签，方便进行分类和搜索</li><li>好友关系： 存储用户之间的好友关系，方便进行好友推荐</li><li>点赞收藏： 存储用户点赞和收藏的文章、商品等，方便进行统计分析</li></ol><h2 id="有序集合" tabindex="-1"><a class="header-anchor" href="#有序集合"><span>有序集合</span></a></h2><p>不能有重复的元素，可排序，每个元素都有一个分数（score），根据分数进行排序</p><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">zadd key score1 member1 score2 member2 # 向有序集合添加元素</span>
+<span class="line">zrange key start end <span class="token punctuation">[</span><span class="token constant">WITHSCORES</span><span class="token punctuation">]</span> # 获取有序集合指定范围的元素，范围为<span class="token punctuation">[</span>start<span class="token punctuation">,</span> end<span class="token punctuation">]</span>，<span class="token constant">WITHSCORES</span> 表示同时返回元素的分数</span>
+<span class="line">zrevrange key start end <span class="token punctuation">[</span><span class="token constant">WITHSCORES</span><span class="token punctuation">]</span> # 获取有序集合指定范围的元素，范围为<span class="token punctuation">[</span>start<span class="token punctuation">,</span> end<span class="token punctuation">]</span>，<span class="token constant">WITHSCORES</span> 表示同时返回元素的分数，按分数从高到低排序</span>
+<span class="line">zscore key member # 获取有序集合中指定元素的分数</span>
+<span class="line">zrem key member1 member2 # 从有序集合中删除元素</span>
+<span class="line">zcard key # 获取有序集合元素数量</span>
+<span class="line">zcount key min max # 获取有序集合中分数在指定范围内的元素数量</span>
+<span class="line">zrank key member # 获取有序集合中指定元素的排名，按分数从低到高排序</span>
+<span class="line">zrevrank key member # 获取有序集合中指定元素的排名，按分数从高到低排序</span>
+<span class="line">zincrby key increment member # 有序集合中指定元素的分数加上指定的增量</span>
+<span class="line">zrangebyscore key min max <span class="token punctuation">[</span><span class="token constant">WITHSCORES</span><span class="token punctuation">]</span> <span class="token punctuation">[</span><span class="token constant">LIMIT</span> offset count<span class="token punctuation">]</span> # 获取有序集合中分数在指定范围内的元素，范围为<span class="token punctuation">[</span>min<span class="token punctuation">,</span> max<span class="token punctuation">]</span>，<span class="token constant">WITHSCORES</span> 表示同时返回元素的分数，<span class="token constant">LIMIT</span> 表示限制返回结果的数量和偏移量</span>
+<span class="line">zremrangebyscore key min max # 从有序集合中删除分数在指定范围内的元素，范围为<span class="token punctuation">[</span>min<span class="token punctuation">,</span> max<span class="token punctuation">]</span></span>
+<span class="line">zunionstore destination key1 key2 # 求多个有序集合的并集，并将结果存储到新有序集合中</span>
+<span class="line">zinterstore destination key1 key2 # 求多个有序集合的交集，并将结果存储到新有序集合中</span>
+<span class="line"></span>
+<span class="line">zinterstore destination key1 key2 weights weight1 weight2 aggregate sum<span class="token operator">|</span>min<span class="token operator">|</span>max # 求多个有序集合的交集，并将结果存储到新有序集合中，weights 表示每个有序集合的权重，aggregate 表示聚合方式，sum 表示按分数求和，min 表示按分数取最小值，max 表示按分数取最大值</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>inf 和 <span class="token operator">+</span>inf 表示负无穷大和正无穷大，分别用于表示有序集合的最小和最大分数</span>
+<span class="line">zrangebyscore key <span class="token operator">-</span>inf <span class="token operator">+</span>inf # 获取有序集合所有元素，按分数从低到高排序</span>
+<span class="line">zrevrangebyscore key <span class="token operator">+</span>inf <span class="token operator">-</span>inf # 获取有序集合所有元素，按分数从高到低排序</span>
+<span class="line"></span>
+<span class="line">zrevrangebyscore <span class="token function">key</span> <span class="token punctuation">(</span><span class="token number">250</span> <span class="token operator">+</span>inf withscores # 获取有序集合中分数大于<span class="token number">250</span>的元素，按分数从高到低排序，同时返回元素的分数</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="内部编码-4" tabindex="-1"><a class="header-anchor" href="#内部编码-4"><span>内部编码</span></a></h3><ol><li>ziplist ： 压缩列表</li><li>skiplist ： 跳跃列表</li></ol><h3 id="使用场景-3" tabindex="-1"><a class="header-anchor" href="#使用场景-3"><span>使用场景</span></a></h3><ol><li>排行榜系统： 存储用户得分，根据得分排序展示排行榜</li><li>时间轴： 存储事件，根据时间排序展示时间轴</li><li>商品排序： 存储商品，根据价格、销量等排序展示商品列表</li></ol><p>列出列表、集合、有序集合的异同点</p><p><img src="/awesome/diff.png" alt="异同点"></p><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">rename oldkey newkey # 重命名键</span>
+<span class="line"><span class="token keyword">get</span> newkey # 获取新键对应的值</span>
+<span class="line">renamenx oldkey newkey # 只有在新键不存在时才重命名键</span>
+<span class="line">randomkey # 随机返回一个键</span>
+<span class="line">dbsize # 返回数据库中键的数量</span>
+<span class="line">ttl key # 查看键的过期时间，单位为秒</span>
+<span class="line">expire key seconds # 设置键的过期时间，单位为秒</span>
+<span class="line">pttl key # 查看键的过期时间，单位为毫秒</span>
+<span class="line">expireat key timestamp # 设置键的过期时间，单位为秒，timestamp 为时间戳</span>
+<span class="line">pexpire key milliseconds # 设置键的过期时间，单位为毫秒</span>
+<span class="line">pexpireat key milliseconds<span class="token operator">-</span>timestamp # 设置键的过期时间，单位为毫秒，milliseconds<span class="token operator">-</span>timestamp 为时间戳</span>
+<span class="line">persist key # 移除键的过期时间，将键设置为永久有效</span>
+<span class="line">removeExpire key # 移除键的过期时间，将键设置为永久有效</span>
+<span class="line"></span>
+<span class="line">move key db # 将键移动到指定数据库，db 为数据库编号</span>
+<span class="line">dump key # 序列化键对应的值，返回序列化后的字符串</span>
+<span class="line">restore key ttl serialized<span class="token operator">-</span>value # 反序列化字符串，将其设置为键对应的值，ttl 为过期时间，serialized<span class="token operator">-</span>value 为序列化后的字符串</span>
+<span class="line"></span>
+<span class="line"># 源Redis执行dump<span class="token operator">:</span></span>
+<span class="line"><span class="token keyword">set</span> hello world</span>
+<span class="line">dump hello # 输出：\x00\x05hello\x00\x05world</span>
+<span class="line"></span>
+<span class="line"># 目标Redis指定restore</span>
+<span class="line"><span class="token keyword">get</span> hello</span>
+<span class="line">restore hello <span class="token number">0</span> <span class="token string">&quot;\x00\x05hello\x00\x05world&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span class="token keyword">get</span> hello # 输出：world</span>
+<span class="line"></span>
+<span class="line">migrate host port key destination<span class="token operator">-</span>db timeout copy replace key<span class="token operator">...</span> # 将键从当前Redis迁移到指定Redis，host 为目标Redis主机，port 为目标Redis端口，key 为要迁移的键，destination<span class="token operator">-</span>db 为目标Redis数据库编号，timeout 为迁移超时时间，单位为毫秒，copy 表示是否在迁移过程中复制键对应的值，而不是移动，replace 表示如果目标Redis中已存在相同键，则替换它</span>
+<span class="line"></span>
+<span class="line">migrate <span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span> <span class="token number">6380</span> hello <span class="token number">0</span> <span class="token number">10000</span> copy replace</span>
+<span class="line"></span>
+<span class="line">keys <span class="token operator">*</span> # 查看所有键</span>
+<span class="line">keys <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span> # 查看索引为<span class="token number">1</span>和<span class="token number">3</span>的键</span>
+<span class="line">keys <span class="token punctuation">[</span><span class="token number">1</span><span class="token operator">-</span><span class="token number">3</span><span class="token punctuation">]</span> # 查看索引为<span class="token number">1</span>到<span class="token number">3</span>的键</span>
+<span class="line">keys <span class="token punctuation">[</span>j<span class="token punctuation">,</span>r<span class="token punctuation">]</span>edis # 查看所有以j或r开头的键</span>
+<span class="line">keys hill<span class="token operator">*</span>  # 查看所有以hill开头的键</span>
+<span class="line"></span>
+<span class="line">scan cursor <span class="token punctuation">[</span><span class="token constant">MATCH</span> pattern<span class="token punctuation">]</span> <span class="token punctuation">[</span><span class="token constant">COUNT</span> count<span class="token punctuation">]</span> # 迭代数据库中的键</span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="数据库管理" tabindex="-1"><a class="header-anchor" href="#数据库管理"><span>数据库管理</span></a></h3><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">select dbIndex # 切换数据库，dbIndex 为数据库编号</span>
+<span class="line"># 默认进来是<span class="token number">0</span>号数据库，默认的一共<span class="token number">16</span>个数据库</span>
+<span class="line">flushdb # 清空当前数据库</span>
+<span class="line">flushall # 清空所有数据库</span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h2 id="小功能大用处" tabindex="-1"><a class="header-anchor" href="#小功能大用处"><span>小功能大用处</span></a></h2><h3 id="慢查询分析" tabindex="-1"><a class="header-anchor" href="#慢查询分析"><span>慢查询分析</span></a></h3><pre><code>1. 执行顺序
+    - 发送命令
+    - 命令排队
+    - 命令执行 ：只统计这个时间
+    - 命令返回
+2. 慢查询分析配置
+    - slowlog-log-slower-than ： 慢查询阈值，单位为微秒，默认值为10000微秒，即10毫秒
+    - slowlog-max-len ： 慢查询日志最大长度，默认值为128，即最多存储128条慢查询日志
+    - slowlog-get-len ： 获取慢查询日志长度
+</code></pre><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">config <span class="token keyword">get</span> slowlog<span class="token operator">-</span>log<span class="token operator">-</span>slower<span class="token operator">-</span>than # 获取慢查询阈值</span>
+<span class="line">config <span class="token keyword">set</span> slowlog<span class="token operator">-</span>log<span class="token operator">-</span>slower<span class="token operator">-</span>than <span class="token number">10000</span> # 设置慢查询阈值为<span class="token number">10</span>毫秒</span>
+<span class="line">config <span class="token keyword">get</span> slowlog<span class="token operator">-</span>max<span class="token operator">-</span>len # 获取慢查询日志最大长度</span>
+<span class="line">config <span class="token keyword">set</span> slowlog<span class="token operator">-</span>max<span class="token operator">-</span>len <span class="token number">128</span> # 设置慢查询日志最大长度为<span class="token number">128</span>条</span>
+<span class="line">config <span class="token keyword">get</span> slowlog<span class="token operator">-</span>get<span class="token operator">-</span>len # 获取慢查询日志长度</span>
+<span class="line">config <span class="token keyword">set</span> slowlog<span class="token operator">-</span>get<span class="token operator">-</span>len <span class="token number">10</span> # 设置慢查询日志长度为<span class="token number">10</span>条</span>
+<span class="line">config rewrite # 重新加载配置文件，使新的配置生效</span>
+<span class="line"></span>
+<span class="line">slowlog <span class="token keyword">get</span> <span class="token number">10</span> # 获取最近<span class="token number">10</span>条慢查询日志</span>
+<span class="line">slowlog len # 获取慢查询日志长度</span>
+<span class="line">slowlog reset # 清空慢查询日志</span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><p>最佳实践</p><ol><li>slowlog-max-len: # 线上建议调大慢查询列表，记录慢查询时Redis会对长命令进行截断，只记录截断后的命令</li><li>slowlog-log-slower-than: # 默认超过10毫秒判定为慢查询，高OPS场景建议设置为1毫秒</li><li>只记录命令执行时间，不记录命令排队时间和网络传输时间。</li><li>先进先出的队列，如果慢查询比较多的情况下，会丢失部分慢查询命令，定期执行slow get命令将日志持久化到其他存储中</li></ol><h3 id="redis-shell" tabindex="-1"><a class="header-anchor" href="#redis-shell"><span>Redis Shell</span></a></h3><h4 id="redis-cli" tabindex="-1"><a class="header-anchor" href="#redis-cli"><span>redis-cli</span></a></h4><p>了解全部参数，可以执行redis-cli-help查看</p><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line"><span class="token operator">-</span>r count # 重复执行命令，count 为重复次数</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>r <span class="token number">3</span> ping # 发送<span class="token number">3</span>个ping命令</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>i interval # 间隔时间，单位为秒，默认值为<span class="token number">0.1</span>秒</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>i <span class="token number">1</span> <span class="token operator">-</span>r <span class="token number">3</span> ping # 发送<span class="token number">3</span>个ping命令，每个命令间隔<span class="token number">1</span>秒</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>x # 执行命令后退出</span>
+<span class="line">echo <span class="token string">&#39;world&#39;</span> <span class="token operator">|</span> redis<span class="token operator">-</span>cli <span class="token operator">-</span>x <span class="token keyword">set</span> hello # 从标准输入读取数据，将其设置为键hello对应的值</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token keyword">get</span> hello # 输出：world</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>c # 连接到指定的Redis实例，默认连接到<span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span><span class="token operator">:</span><span class="token number">6379</span></span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span> <span class="token operator">-</span>p <span class="token number">6379</span></span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>a password # 连接到需要密码认证的Redis实例，password 为密码</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">-</span>h <span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span> <span class="token operator">-</span>p <span class="token number">6379</span></span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>scan和<span class="token operator">--</span>pattern # 扫描数据库中的键，<span class="token operator">--</span>pattern 为匹配模式，默认值为<span class="token operator">*</span>，即匹配所有键</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>scan <span class="token operator">--</span>pattern hello<span class="token operator">*</span> # 扫描所有以hello开头的键</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>slave # 连接到从节点，默认连接到主节点</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>slave <span class="token operator">-</span>h <span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span> <span class="token operator">-</span>p <span class="token number">6380</span></span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>rdb # 连接到<span class="token constant">RDB</span>文件，默认连接到dump<span class="token punctuation">.</span>rdb</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>rdb dump<span class="token punctuation">.</span>rdb # 连接到<span class="token constant">RDB</span>文件dump<span class="token punctuation">.</span>rdb</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>pipe # 连接到Redis实例，默认连接到<span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span><span class="token operator">:</span><span class="token number">6379</span></span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>pipe # 连接到Redis实例，默认连接到<span class="token number">127.0</span><span class="token number">.0</span><span class="token number">.1</span><span class="token operator">:</span><span class="token number">6379</span></span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>bigkeys # 扫描数据库中的键，统计键的大小和类型</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>bigkeys # 扫描数据库中的键，统计键的大小和类型</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>eval script<span class="token punctuation">.</span>lua key1 key2 arg1 arg2 # 执行Lua脚本，script<span class="token punctuation">.</span>lua 为Lua脚本文件，key1 key2 为键，arg1 arg2 为参数</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>latency # 开启延迟分析模式，用于分析命令执行时间</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>latency # 开启延迟分析模式，用于分析命令执行时间</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>latency<span class="token operator">-</span>history # 显示延迟分析历史记录</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>latency<span class="token operator">-</span>history # 显示延迟分析历史记录</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>latency<span class="token operator">-</span>dist # 显示延迟分析分布直方图</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>latency<span class="token operator">-</span>dist # 显示延迟分析分布直方图</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>stat # 显示统计信息，包括连接数、命令数、内存使用情况等</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>stat # 显示统计信息，包括连接数、命令数、内存使用情况等</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>raw # 以原始格式输出命令返回值，不进行任何转换</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>raw <span class="token keyword">get</span> hello # 输出：world</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>no<span class="token operator">-</span>raw # 禁用原始格式输出，默认值为<span class="token boolean">false</span><span class="token punctuation">,</span>返回的是二进制格式</span>
+<span class="line">redis<span class="token operator">-</span>cli <span class="token operator">--</span>no<span class="token operator">-</span>raw <span class="token keyword">get</span> hello # 输出：world</span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h4 id="redis-server详解" tabindex="-1"><a class="header-anchor" href="#redis-server详解"><span>redis-server详解</span></a></h4><p>--test-memory # 测试内存使用情况 redis-server --test-memory # 测试内存使用情况</p><h4 id="redis-benchmark" tabindex="-1"><a class="header-anchor" href="#redis-benchmark"><span>redis-benchmark</span></a></h4><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line"><span class="token operator">-</span>c clients # 并发客户端数量，默认值为<span class="token number">50</span></span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>n requests # 每个客户端执行的请求数量，默认值为<span class="token number">100000</span></span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>q #  quiet # 安静模式，只输出结果，不输出其他信息<span class="token punctuation">,</span>仅仅显示redis<span class="token operator">-</span>benchmark的requests per second的信息</span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> <span class="token operator">-</span>q # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令，只输出结果，不输出其他信息</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>r size # 随机值大小 random</span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> <span class="token operator">-</span>r <span class="token number">100</span> # <span class="token operator">-</span>r 在key，counter键上加一个<span class="token number">12</span>位的后缀， <span class="token operator">-</span>r <span class="token number">100</span> 表示只对后两位随机处理，</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span><span class="token constant">P</span> pipeline<span class="token operator">-</span>size # <span class="token function">管道大小，默认值为1，即不使用管道</span> <span class="token punctuation">(</span>pipeline<span class="token punctuation">)</span>选项</span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> <span class="token operator">-</span><span class="token constant">P</span> <span class="token number">100</span> # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令，每个命令使用<span class="token number">100</span>个元素组成的管道</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>k keepalive # 保持连接，默认值为<span class="token number">0</span>，即不保持连接</span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> <span class="token operator">-</span>k <span class="token number">1</span> # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令，保持连接</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">-</span>t commands # 测试的命令列表</span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>t get<span class="token punctuation">,</span>set <span class="token operator">-</span>q # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令，超时时间为<span class="token number">10</span>秒</span>
+<span class="line"></span>
+<span class="line"><span class="token operator">--</span>csv # 输出结果为<span class="token constant">CSV</span>格式</span>
+<span class="line">redis<span class="token operator">-</span>benchmark <span class="token operator">-</span>c <span class="token number">100</span> <span class="token operator">-</span>n <span class="token number">100000</span> <span class="token operator">-</span>q <span class="token operator">--</span>csv # 模拟<span class="token number">100</span>个并发客户端，每个客户端执行<span class="token number">100000</span>个命令，只输出结果，不输出其他信息，输出结果为<span class="token constant">CSV</span>格式</span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="pipeline" tabindex="-1"><a class="header-anchor" href="#pipeline"><span>Pipeline</span></a></h3><p>RTT ： Round Trip Time，即往返时间，指的是客户端发送命令到服务器接收响应的时间，包括网络传输时间和服务器处理时间。 原生批量命令是原子的，Pipeline是非原子的 原生批量命令是一个命令对应多个key,Pipeline支持多个命令 原生批量命令是Redis服务端支持实现的，Pipeline需要服务端和客户端的共同实现</p><h3 id="事务与lua" tabindex="-1"><a class="header-anchor" href="#事务与lua"><span>事务与Lua</span></a></h3><p>事务： 多个命令作为一个整体执行，要么全部成功，要么全部失败 multi # 开始一个事务 exec # 执行事务中的所有命令 discard # 取消事务</p><p><strong>Lua</strong> 数据类型：booleans numbers, strings, tables</p><div class="language-javascript line-numbers-mode" data-highlighter="prismjs" data-ext="js"><pre><code class="language-javascript"><span class="line">local strings val <span class="token operator">=</span> <span class="token string">&quot;world&quot;</span> # local 代表val是一个局部变量，没有代表全局变量</span>
+<span class="line">local tables myArray <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">&quot;hello&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;world&quot;</span><span class="token punctuation">}</span> # 数组</span>
+<span class="line"># 计算<span class="token number">1</span>到<span class="token number">100</span>的和</span>
+<span class="line">local int sum <span class="token operator">=</span> <span class="token number">0</span></span>
+<span class="line"><span class="token keyword">for</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">100</span></span>
+<span class="line"><span class="token keyword">do</span></span>
+<span class="line">    sum <span class="token operator">=</span> sum <span class="token operator">+</span> i</span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"><span class="token function">print</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span> # 输出：<span class="token number">5050</span></span>
+<span class="line"></span>
+<span class="line"># 遍历myArray</span>
+<span class="line"><span class="token keyword">for</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span> #myArray</span>
+<span class="line"><span class="token keyword">do</span></span>
+<span class="line">    <span class="token function">print</span><span class="token punctuation">(</span>myArray<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span></span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"># 内置函数ipairs 遍历出所有的索引下标和值：</span>
+<span class="line"><span class="token keyword">for</span> index<span class="token punctuation">,</span>value <span class="token keyword">in</span> <span class="token function">ipairs</span><span class="token punctuation">(</span>myArray<span class="token punctuation">)</span></span>
+<span class="line"><span class="token keyword">do</span></span>
+<span class="line">    <span class="token function">print</span><span class="token punctuation">(</span>index<span class="token punctuation">,</span>value<span class="token punctuation">)</span></span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"># <span class="token keyword">while</span></span>
+<span class="line">local int sum <span class="token operator">=</span> <span class="token number">0</span></span>
+<span class="line">local int i <span class="token operator">=</span> <span class="token number">0</span></span>
+<span class="line"><span class="token keyword">while</span> i <span class="token operator">&lt;</span> <span class="token number">100</span></span>
+<span class="line"><span class="token keyword">do</span></span>
+<span class="line">    sum <span class="token operator">=</span> sum <span class="token operator">+</span> i</span>
+<span class="line">    i <span class="token operator">=</span> i <span class="token operator">+</span> <span class="token number">1</span></span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"><span class="token function">print</span><span class="token punctuation">(</span>sum<span class="token punctuation">)</span> # 输出：<span class="token number">5050</span></span>
+<span class="line"></span>
+<span class="line"># <span class="token keyword">if</span> <span class="token keyword">else</span></span>
+<span class="line">local tables myArray <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token string">&quot;redis&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;mysql&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;postgresql&quot;</span><span class="token punctuation">,</span> <span class="token string">&#39;jedis&#39;</span><span class="token punctuation">}</span></span>
+<span class="line"><span class="token keyword">for</span> i <span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">,</span> #myArray</span>
+<span class="line"><span class="token keyword">do</span></span>
+<span class="line">    <span class="token keyword">if</span> myArray<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">==</span> <span class="token string">&quot;jedis&quot;</span></span>
+<span class="line">    then</span>
+<span class="line">        <span class="token function">print</span><span class="token punctuation">(</span><span class="token string">&#39;true&#39;</span><span class="token punctuation">)</span></span>
+<span class="line">        <span class="token keyword">break</span></span>
+<span class="line">    <span class="token keyword">else</span></span>
+<span class="line">        <span class="token function">print</span><span class="token punctuation">(</span><span class="token string">&#39;false&#39;</span><span class="token punctuation">)</span></span>
+<span class="line">    end</span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"># 哈希</span>
+<span class="line">local tables myHash <span class="token operator">=</span> <span class="token punctuation">{</span>name<span class="token operator">=</span><span class="token string">&quot;redis&quot;</span><span class="token punctuation">,</span> version<span class="token operator">=</span><span class="token string">&quot;6.0.10&quot;</span><span class="token punctuation">}</span></span>
+<span class="line"><span class="token function">print</span><span class="token punctuation">(</span>myHash<span class="token punctuation">.</span>name<span class="token punctuation">)</span> # 输出：redis</span>
+<span class="line"><span class="token function">print</span><span class="token punctuation">(</span>myHash<span class="token punctuation">.</span>version<span class="token punctuation">)</span> # 输出：<span class="token number">6.0</span><span class="token number">.10</span></span>
+<span class="line"></span>
+<span class="line"><span class="token keyword">for</span> key<span class="token punctuation">,</span>value <span class="token keyword">in</span> <span class="token function">pairs</span><span class="token punctuation">(</span>myHash<span class="token punctuation">)</span></span>
+<span class="line"><span class="token keyword">do</span></span>
+<span class="line">    <span class="token function">print</span><span class="token punctuation">(</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span> value<span class="token punctuation">)</span></span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"># 函数</span>
+<span class="line"><span class="token keyword">function</span> <span class="token function">funcName</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span>
+<span class="line">    <span class="token operator">...</span></span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"><span class="token keyword">function</span> <span class="token function">contact</span> <span class="token punctuation">(</span><span class="token parameter">str1<span class="token punctuation">,</span> str2</span><span class="token punctuation">)</span></span>
+<span class="line">    <span class="token keyword">return</span> str1 <span class="token punctuation">.</span><span class="token punctuation">.</span> str2</span>
+<span class="line">end</span>
+<span class="line"></span>
+<span class="line"><span class="token function">print</span><span class="token punctuation">(</span><span class="token function">contact</span><span class="token punctuation">(</span><span class="token string">&quot;hello&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;world&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span> # 输出：helloworld</span>
+<span class="line"></span>
+<span class="line">eval <span class="token string">&#39;return &quot;hello &quot; .. KEYS[1] .. ARGV[1]&#39;</span> <span class="token number">1</span> redis world # 输出：hello redis world</span>
+<span class="line"></span>
+<span class="line">evalsha sha1 <span class="token number">1</span> redis world # 输出：hello redis world # sha1 为eval命令返回的脚本哈希值</span>
+<span class="line">script load 命令可以将脚本内容加载到Redis内存中，</span>
+<span class="line">redis<span class="token operator">-</span>cli script load <span class="token string">&quot;$(cat lua_get.lua)&quot;</span> # <span class="token string">&quot;1231231sdfa1edfa&quot;</span></span>
+<span class="line">evalsha 1231231sdfa1edfa <span class="token number">1</span> redis world # 输出：hello redis world</span>
+<span class="line"></span>
+<span class="line"></span></code></pre><div class="line-numbers" aria-hidden="true" style="counter-reset:line-number 0;"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h3 id="bitmaps" tabindex="-1"><a class="header-anchor" href="#bitmaps"><span>Bitmaps</span></a></h3><h3 id="hyperloglog" tabindex="-1"><a class="header-anchor" href="#hyperloglog"><span>HyperLogLog</span></a></h3><h3 id="发布订阅" tabindex="-1"><a class="header-anchor" href="#发布订阅"><span>发布订阅</span></a></h3><h3 id="ceo" tabindex="-1"><a class="header-anchor" href="#ceo"><span>CEO</span></a></h3></div><!--[--><!--]--></div><footer class="vp-page-meta"><!----><div class="vp-meta-item git-info"><!----><!----></div></footer><!----><!--[--><!--]--></main><!--]--></div><!--[--><!----><!--]--><!--]--></div>
+    <script type="module" src="/awesome/assets/app-DvL9NwtO.js" defer></script>
+  </body>
+</html>
