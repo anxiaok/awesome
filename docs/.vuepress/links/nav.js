@@ -8,6 +8,10 @@ module.exports = [
     link: '/redis',
   },
   {
+    text: 'mysql',
+    link: '/mysql',
+  },
+  {
     text: 'react',
     link: '/react',
   },

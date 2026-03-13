@@ -482,7 +482,7 @@ RTT ： Round Trip Time，即往返时间，指的是客户端发送命令到服
 原生批量命令是一个命令对应多个key,Pipeline支持多个命令
 原生批量命令是Redis服务端支持实现的，Pipeline需要服务端和客户端的共同实现
 
-### 事务与Lua
+### 3.4 事务与Lua
 事务： 多个命令作为一个整体执行，要么全部成功，要么全部失败
 multi # 开始一个事务
 exec # 执行事务中的所有命令
@@ -566,9 +566,173 @@ script load 命令可以将脚本内容加载到Redis内存中，
 redis-cli script load "$(cat lua_get.lua)" # "1231231sdfa1edfa"
 evalsha 1231231sdfa1edfa 1 redis world # 输出：hello redis world
 
-```
+redis.call('set', 'hello', 'world')
+redis.call('get', 'hello') # 输出：world
+redis.pcall('get', 'hello') # 输出：world
+redis.log(redis.LOG_NOTICE, 'hello world') # 输出：hello world
 
-### Bitmaps
+eval 'return redis.call("get", KEYS[1])' 1 hello # 输出：world
+
+```
+```sh
+lrange hot:user:list 0 -1
+# "user:1:ratio"
+# "user:8:ratio"
+# "user:3:ratio"
+# "user:99:ratio"
+# "user:72:ratio"
+
+mget user:1:ratio user:8:ratio user:3:ratio user:99:ratio user:72:ratio
+# "986"
+# "762"
+# "556"
+# "400"
+# "101"
+
+# 文件lrange_and_mincr.lua文件
+local mylist = redis.call('lrange', KEYS[1], 0, -1)
+local count = 0
+for index,key in ipairs(mylist)
+do
+    redis.call('incr', key)
+    count = count + 1
+end
+return count
+
+# 执行脚本 后会自增1
+redis-cli --eval lrange_and_mincr.lua hot:user:list
+mget user:1:ratio user:8:ratio user:3:ratio user:99:ratio user:72:ratio
+# "987"
+# "763"
+# "557"
+# "401"
+# "102"
+
+```
+- Redis如何原来Lua脚本？
+    - script load # script load script
+    - script exists # script exists sha1 # 检查脚本是否存在
+    - script flush # 清空所有脚本缓存
+    - script kill # 终止正在执行的脚本
+    - shutdown nosave # 杀掉busy的脚本
+> 如果redis 已经阻塞, 执行script kill 客户端会恢复（如果lua脚本正在执行写操作，那么script kill不会生效，会报错）
+> 此时可以用shutdown nosave 命令强制终止redis进程
+
+### 3.5 Bitmaps
+- 数据结构模型
+    - 1个字节8位
+    - Bitmaps 本身不是一种数据结构，实际上它就是字符串，但是它可以对字符串的位进行操作
+    - 单独提供了一套命令
+- 命令
+    - 每次做setbit操作时，将用户id减去这个指定数字，假如偏移量非常大，初始化的过程会比较慢，可能会造成Redis的阻塞
+```sh
+setbit key offset value # 设置key的offset位为value
+getbit key offset # 获取key的offset位
+bitcount key [start end] # 统计key中从start到end的位中1的数量
+bitop operation destkey key [key ...] # 对多个key进行位操作，operation 为and（交集）、or（并集）、not（非）、xor（异或）
+bitpos key bit [start end] # 查找key中从start到end的位中第一个为bit的位置
+```
 ### HyperLogLog
+
+> 实际类型是字符串类型，并不是一种新的数据结构，而是一种基数算法
+> 可以利用极少的内存空间完成独立总数的统计，数据集可以是IP，Email,ID 等
+> 内存占用量非常小，但是存在一定的误差，误差率为0.81%
+```sh
+pfadd key element [element ...] # 添加元素到HyperLogLog中
+pfcount key [key ...] # 统计HyperLogLog中独立总数
+pfmerge destkey key [key ...] # 合并多个HyperLogLog到一个中
+```
 ### 发布订阅
+- 发布订阅模式是一种消息通信模式，发布者将消息发送到频道，订阅者可以订阅一个或多个频道，当频道有新消息时，订阅者会收到通知
+- 发布订阅模式的优势是可以实现解耦，发布者和订阅者之间没有直接的依赖关系，订阅者可以在任何时候订阅或取消订阅
+- 发布订阅模式的劣势是消息可能会丢失，因为订阅者可能在发布消息时不在线
+```sh
+subscribe channel [channel ...] # 订阅一个或多个频道
+unsubscribe [channel [channel ...]] # 取消订阅一个或多个频道
+publish channel message # 发布一条消息到指定频道
+psubscribe pattern [pattern ...] # 订阅一个或多个模式匹配的频道
+punsubscribe [pattern [pattern ...]] # 取消订阅一个或多个模式匹配的频道
+pubsub channels [pattern] # 列出所有频道或匹配模式的频道
+pubsub numsub [channel [channel ...]] # 列出订阅指定频道的订阅者数量
+pubsub numpat # 列出当前订阅模式的订阅者数量
+```
+#### 使用场景
+- 实时分析：例如，统计网站的实时访问量、用户行为等
+- 实时通知：例如，用户注册成功后，发送一条通知消息给所有订阅了该频道的用户
+- 实时聊天：例如，用户在聊天 room 中发送消息，所有订阅了该 room 频道的用户都会收到消息
 ### CEO 
+- 地理信息定位功能
+    - unit： 
+        - m(米)
+        - km(公里)
+        - ft(英尺)
+        - mi(英里)
+```sh
+geoadd key longitude latitude member [longitude latitude member ...] # 添加一个或多个地理空间位置到key中
+geopos key member [member ...] # 获取一个或多个成员的地理空间位置
+geodist key member1 member2 [unit] # 计算两个成员之间的距离
+georadius key longitude latitude radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] # 以给定的经纬度为中心，返回半径内的成员
+georadiusbymember key member radius m|km|ft|mi [WITHCOORD] [WITHDIST] [WITHHASH] [COUNT count] # 以给定的成员为中心，返回半径内的成员 withcoord 会返回成员的经纬度 与距离 withhash 会返回成员的哈希值 count 会返回指定数量的成员  withdist 会返回成员的距离
+geohash key member [member ...] # 获取一个或多个成员的geohash值
+zrem key member [member ...] # 从有序集合中移除一个或多个成员
+```
+## 第4章 客户端
+### 4.1 客户端通信协议
+> 第一：客户端和服务端之间的通信协议是在TCP协议之上构建的
+> 第二：Redis制定了RESP（序列化协议）实现客户端与服务端的正常交互
+- 返回结果类型：
+    - 简单字符串：以"+"开头，后面跟着字符串，以"\r\n"结尾
+    - 错误信息：以"-"开头，后面跟着字符串，以"\r\n"结尾
+    - 整数：以":"开头，后面跟着字符串表示的整数，以"\r\n"结尾
+    - 浮点数：以":"开头，后面跟着字符串表示的浮点数，以"\r\n"结尾
+    - 字符串：以"$"开头，后面跟着字符串的长度，以"\r\n"结尾，再跟着字符串内容，以"\r\n"结尾
+    - 数组：以"*"开头，后面跟着数组的长度，以"\r\n"结尾，再跟着数组的元素，每个元素的序列化结果，以"\r\n"结尾
+### 4.2 Java客户端Jedis
+```java
+Jedis jedis = new Jedis('127.0.0.1', 6379);
+jedis.set('hello', 'world');
+String value = jedis.get('hello');
+Jedis(final String host, final int port, final int connectionTimeout, final int soTimeout)
+ # 构造函数，指定主机、端口和超时时间
+ # host: 主机名或IP地址
+ # port: 端口号
+ # connectionTimeout: 连接超时时间，单位毫秒
+ # soTimeout: 套接字超时时间，单位毫秒
+```
+```java
+# 1. string
+jedis.set('hello', 'world');
+jedis.get('hello');
+jedis.incr('counter');
+# 2. hash
+jedis.hset('user', 'name', 'xiaowang');
+jedis.hget('user', 'name');
+jedis.hgetAll('user');
+# 3. list
+jedis.lpush('user', 'xiaowang1');
+jedis.lpush('user', 'xiaowang');
+jedis.lrange('user', 0, -1);
+# 4. set
+jedis.sadd('user', 'xiaowang1');
+jedis.sadd('user', 'xiaowang');
+jedis.smembers('user');
+# 5. zset
+jedis.zadd('user', 100, 'xiaowang1');
+jedis.zadd('user', 90, 'xiaowang');
+jedis.zrange('user', 0, -1);
+jedis.zrangeWithScores('user', 0, -1);
+# 6. 过期时间
+jedis.expire('hello', 60); # 设置key hello 在60秒后过期
+jedis.ttl('hello'); # 获取key hello 的过期时间，单位秒
+```
+jedis还提供了字节数组的参数
+```java
+public String set(final String key, String value)
+public String set(final byte[] key, final byte[] value)
+public byte[] get(final byte[] key)
+public String get(final String key)
+```
+- jedis本身没有提供序列化的工具，开发者需要自己引入工具，例如: XML,Json,谷歌的Protobuf, Facebook的Thrift等
+- jedis直连方式：每次都会新建TCP连接，使用后再断开连接，对于频繁访问Redis的场景，显然不是高效的方式
+- 因此生产环境- 建议使用连接池方式，例如：JedisPool、Lettuce等
+![jedis直连和连接池对比](/jedis.png)

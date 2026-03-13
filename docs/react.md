@@ -274,33 +274,391 @@ componentDidMount/ componentDidUpdate： 他们两个是同步执行的，时机
 useInsertionEffect：执行时机比useLayoutEffect更早，在DOM更新之前执行,主要解决css-in-js在渲染中注入样式的性能问题。
 
 ## Ref
+> Ref对象的创建：用createRef或useRef创建出来的对象
+> React本身对Ref的处理
+
+**注意： 不要在函数组件中使用createRef,否则会造成Ref对象的丢失**
+
 ```js
+# 一个标准的ref对象
+{
+    current: null
+}
+export function createRef() { # 一般用于类组件创建Ref对象 
+    return {
+        current: null
+    }
+}
+```
 1. 类组件React.createRef
-    this.currentDom = React.createRef(null);
-    - Ref属性是一个字符串
-        - <div ref="currentDom"></div>
-    - Ref属性是一个函数
-        - <div ref={(dom) => this.currentDom = dom}></div>
-    - Ref属性是一个ref对象
-        - <div ref={this.currentDom}></div>
-2. 函数组件useRef
-    const currentDom = React.useRef(null);
-```
-
-### 高阶用法
 ```js
-1. forwardRef 转发Ref
-> 解决ref不能跨层级捕获和传递的问题
-> React.forwardRef((props, ref) => {
->     return <div ref={ref} {...props}></div>
-> })
-
-2. 合并转发ref
-> 传递合并之后的自定义的ref
-
-3. 高阶组件转发
+class Index extends React.Component {
+    constructor(props) {
+        super(props);
+        this.currentDom = React.createRef(null);
+    }
+    componentDidMount() {
+        console.log(this.currentDom.current); // { current: div }
+    }
+    render = () => {
+        return <div ref={ this.currentDom }>ref对象模式获取元素或组件</div>
+    }
+}
 ```
+2. 函数组件useRef
+```js
+export default function Index() {
+    const currentDom = React.useRef(null);
+    React.useEffect(() => {
+        console.log(currentDom.current); // <div>ref对象模式获取元素或组件</div>
+    }, []);
+    return <div ref={currentDom}>ref对象模式获取元素或组件</div>
+}
+```
+
+- 类组件有示例instance能够维护像ref这种信息
+- 函数组件是每次更新都是一个新的开始，所有变量重新声明
+- 所以useRef不能像createRef把ref对象直接暴露出去，
+- 如果这样，每次函数组件执行，都会重新声明Ref，ref就会随着函数组件执行被重置，
+- 这就解释了为啥函数组件中不能用createRef的原因
+
+- 为了解决这个问题，hooks和函数组件对应的fiber对象建立起关联，将userRef产生的ref对象挂到函数组件对应的fiber上，函数组件每次执行，只要组件不销毁，函数组件对应的fiber对象一直存在，所以ref等信息就会被保存下来
+
+3. 标记ref
+问题： DOM元素和组件实例必须用ref对象获取吗？
+答： 不是，提供了多种方法获取DOM元素和组件实例
+
+**类组件获取ref的三种方式**
+- ref属性是一个字符串
+```js
+class Children extends React.Component {
+    render = () => <div>hello,world</div>
+}
+export default class Index extends React.Component {
+    componentDidMount() {
+        console.log(this.refs);
+    }
+    render = () => <div>
+        <div ref="currentDom">字符串模式获取元素或组件</div>
+        <Children ref="currentComInstance" />
+    </div>
+}
+```
+- ref属性是一个函数
+```js
+class Children extends React.Component {
+    render = () => <div>hello,world</div>
+}
+export default class Index extends React.Component {
+    currentDom = null;
+    currentComInstance = null;
+    componentDidMount() {
+        console.log(this.currentDom); // <div>字符串模式获取元素或组件</div>
+        console.log(this.currentComInstance); // <Children />
+    }
+    render = () => <div>
+        <div ref={ref => this.currentDom = ref}>字符串模式获取元素或组件</div>
+        <Children ref={node => this.currentComInstance = node} />
+    </div>
+}
+``` 
+- ref属性是一个ref对象
+```js
+class Children extends React.Component {
+    render = () => <div>hello,world</div>
+}
+export default class Index extends React.Component {
+    currentDom = React.createRef(null);
+    currentComInstance = React.createRef(null);
+    componentDidMount() {
+        console.log(this.currentDom.current); // <div>字符串模式获取元素或组件</div>
+        console.log(this.currentComInstance.current); // <Children />
+    }
+    render = () => <div>
+        <div ref={this.currentDom}>ref对象模式获取元素或组件</div>
+        <Children ref={this.currentComInstance} />
+    </div>
+}
+
+``` 
+### 高阶用法
+1. forwardRef 转发Ref
+> 初衷：解决ref不能跨层级捕获和传递的问题
+> 解决： 类组件 / 函数组件无法直接接收 ref、ref 无法自动跨层级传递
+
+- 场景一：跨层级获取
+```js
+// 孙组件
+function Son(props) {
+    const { grandRef } = props;
+    return <div>
+        <div>i am alien</div>
+        <span ref={grandRef} >这个是想要获取元素</span>
+    </div>
+}
+class Father extends React.Component{
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return <div>
+            <Son grandRef={this.props.grandRef} />
+        </div>
+    }
+}
+const NewFather = React.forwardRef((props, ref) => <Father grandRef={ref} {...props} />)
+
+class GrandFather extends React.Component{
+    constructor(props) {
+        super(props);
+    }
+    node = null
+    componentDidMount() {
+        console.log(this.node);
+    }
+    render() {
+        return <div>
+            <NewFather ref={node => this.node = node} />
+        </div>
+    }
+}
+```
+如果不用forwardRef，只能通过自定义props传递ref
+```js
+import React, { Component, createRef } from 'react';
+
+// 孙组件：接收自定义props绑定ref
+function Son(props) {
+  // 使用自定义属性名 domRef，避免和原生ref冲突
+  const { domRef } = props;
+  return (
+    <div>
+      <div>i am alien</div>
+      <span ref={domRef}>这个是想要获取元素</span>
+    </div>
+  );
+}
+
+// 父组件：逐层传递自定义props
+class Father extends Component {
+  render() {
+    // 把祖父传下来的 domRef 继续传递给 Son
+    return (
+      <div>
+        <Son domRef={this.props.domRef} />
+      </div>
+    );
+  }
+}
+
+// 祖父组件：创建ref，通过自定义props传递
+class GrandFather extends Component {
+  // 用 createRef 创建标准ref对象（推荐写法，替代回调ref）
+  spanRef = createRef();
+
+  componentDidMount() {
+    // 直接获取到span DOM元素
+    console.log('获取到的DOM元素：', this.spanRef.current);
+    // 可以操作DOM：修改文本、样式等
+    if (this.spanRef.current) {
+      this.spanRef.current.style.color = 'red';
+    }
+  }
+
+  render() {
+    // 通过自定义属性 domRef 传递ref，不使用系统ref
+    return (
+      <div>
+        <Father domRef={this.spanRef} />
+      </div>
+    );
+  }
+}
+
+export default GrandFather;
+```
+- 场景2：合并转发ref
+    - 不要理解为只能用来直接获取组件实例，DOM元素，
+    - 也可以用来传递合并之后的自定义的ref
+```js
+class Form extends React.Component {
+    render() {
+        return <div>...</div>
+    }
+}
+class Index extends React.Component {
+    componentDidMount() {
+        const { forwardRef } = this.props;
+        forwardRef.current = {
+            form: this.form,
+            index: this,
+            button: this.button
+        }
+    }
+    render() {
+        const { forwardRef } = this.props;
+        return <div>
+            <Form ref={ref => this.form = ref} />
+            <button ref={ref => this.button = ref}>提交</button>
+        </div>
+    }
+}
+const ForwardRefIndex = React.forwardRef((props, ref) => <Index {...props} forwardRef={ref} />)
+export default function Home () {
+    const ref = React.useRef(null);
+    useEffect(() => {
+        console.log(ref.current);
+    }, []);
+    return <ForwardRefIndex ref={ref} />
+}
+```
+
 ref实现组件通信
 
 1. 类组件ref
+```js
+class Son extends React.Component {
+    state = {
+        fatherMes: '',
+        sonMes: ''
+    }
+    fatherSay = (fatherMes) => this.setState({ fatherMes })
+    render() {
+        const { fatherMes, sonMes } = this.state;
+        return <div>
+            <p>父组件对我说：{fatherMes}</p>
+            <div className="label">
+                <input onChange={(e) => this.setState({ sonMes: e.target.value })} className="input" />
+                <button onClick={() => this.props.toFather(sonMes)}>发送</button>
+            </div>
+        </div>
+    }
+}
+export default function Father() {
+    const [sonMes, setSonMes] = React.useState('');
+    const sonInstance = React.useRef(null);
+    const [ fatherMes, setFatherMes ] = React.useState('');
+    const toSon = () => sonInstance.current.fatherSay(fatherMes);
+    return <div>
+        <p>子组件对我说：{sonMes}</p>
+        <div className="label">
+            <input onChange={(e) => setFatherMes(e.target.value)} className="input" />
+            <button onClick={toSon}>发送</button>
+        </div>
+        <Son ref={sonInstance} toFather={setSonMes} />
+    </div>
+}
+```
+- 场景3：高阶组件转发
+    - 高阶组件包裹一个原始类组件，就会产生一个问题，
+    - 如果高阶组件HOC没有处理ref,高阶本身返回一个新组件，
+    - 当使用HOC包装后的组件的时候，标记的ref会指向HOC返回的组件，而不是HOC包裹的原始类组件
+```js
+function HOC(Component) {
+    class Wrap extends React.Component {
+        render() {
+            const { forwardedRef, ...otherprops } = this.props;
+            return <Component {...otherprops} ref={forwardedRef} />
+        }
+    }
+    return React.forwardRef((props, ref) => <Wrap {...props} forwardedRef={ref} />)
+}
+class Index extends React.Component {
+    render() {
+        return <div>hello world</div>
+    }
+}
+const HocIndex = HOC(Index);
+export default () => {
+    const node = useRef(null);
+    useEffect(() => {
+        console.log(node.current);
+    }, []);
+    return <div>
+        <HocIndex ref={node} />
+    </div>
+}
+```
+
 2. 函数组件 forwardRef + useImperativeHandle
+
+useImperativeHandle
+- 第一个参数ref: 接受forWardRef传递过来的ref
+- 第二个参数createHandle: 处理函数，返回值作为暴露给父组件的ref对象
+- 第三个参数deps: 依赖项deps, 依赖项更改形成新的ref对象
+
+```js
+function Son(props, ref) {
+    const inputRef = React.useRef(null);
+    const [inputValue, setInputValue] = React.useState('');
+    useImperativeHandle(ref, () => ({
+        focus: () => inputRef.current.focus(),
+        onChangeValue(value) {
+            setInputValue(value);
+        }
+    }), []);
+    return <div>
+        <input ref={inputRef} value={inputValue} className="input" />
+    </div>
+}
+const ForwardSon = React.forwardRef(Son);
+class Index extends React.Component {
+    cur = null;
+    handerClick() {
+        const { onFocus, onChangeValue } = this.cur;
+        onFocus();
+        onChangeValue('hello world');
+    }
+    render() {
+        return <div>
+            <ForwardSon ref={ref => this.cur = ref} />
+            <button onClick={() => this.handerClick.bind(this)}>点击</button>
+        </div>
+    }
+}
+```
+3. 函数组件缓存数据
+useRef 创建一个ref原始对象，只要组件没有销毁，ref对象就一直存在
+```js
+const toLearn = [ { type: 1, mes: '123' }, { type: 2, mes: '456' }];
+export default function Index({ id }) {
+    const typeInfo = React.useRef(null);
+    const changeType = (info) => {
+        typeInfo.current = info;
+    };
+    useEffect(() => {
+        if(typeInfo.current.type === 1) {
+
+        }
+    }, [id]);
+    return <div>
+        {
+            toLearn.map(item => <button key={item.type} onClick={ changeType.bind(null, item) }>{ item.mes }</button>)
+        }
+    </div>
+}
+```
+## context
+
+> Provider提供者注入theme,consumer消费者形式去除theme,
+> 提供者永远要在消费者上层
+
+旧版本
+```js
+import propsTypes from "proptypes"
+class ProviderDemo extends React.Component {
+    getChildContext() {
+        const theme = {
+            color: '#ccc',
+            background: 'pink'
+        };
+        return theme;
+    }
+    render() {
+        return <div>hello, let us learn React!<Son /></div>
+    }
+}
+ProviderDemo.childContextTypes = {
+    theme: propsTypes.object
+}
+```
