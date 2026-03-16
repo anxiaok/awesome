@@ -143,3 +143,67 @@ select prod_name from products where prod_name regexp '[[:digit:]]{4}'; # 筛选
 ### 匹配字符类
 
 ![字符类](/字符类.png)
+
+1. 拼接
+```sql
+SELECT Concat(vend_name, '()', vend_country, ')') from vendors order by vend_name; # 拼接Hello World字符串
+select Concat(RTrim(vend_name), '(', RTrim(vend_country), ')') from vendors order by vend_name; # 拼接Hello World字符串
+select Concat(vend_name, '(', vend_country, ')') as vend_name_country from vendors order by vend_name; # 拼接Hello World字符串
+select prod_id,quantity,item_price, quantity*item_price AS expanded_price from orderitems where order_num=20005;
+select vend_name, Upper(vend_name) as vend_name_upcase from vendors order by vend_name;
+select cust_id,order_num from orders where Date(order_date) = '2005-09-01';
+select cust_id, order_num from orders where Date(order_date) between '2005-09-01' and '2005-09-30';
+```
+### 字符串函数
+- Left() ： 返回串左边的字符
+- Right() ： 返回串右边的字符
+- Length() ： 返回串的长度
+- Locate() ： 找出串的一个子串
+- LTrim() ： 从串的左边移除空格
+- RTrim() ： 从串的右边移除空格
+- Soundex() ： 返回串的Soundex编码
+- SubString() ： 返回串的一个子串
+- Upper() ： 返回串的大写版本
+- Lower() ： 返回串的小写版本
+### 日期函数
+- AddDate() ： 返回日期加上指定的天数
+- AddTime() ： 返回时间加上指定的时间
+- CurDate() ： 返回当前日期
+- CurTime() ： 返回当前时间
+- Date() ： 返回日期
+- Time() ： 返回时间
+- DateDiff() ： 返回两个日期之间的天数
+- Date_Add() ： 返回日期加上指定的时间间隔
+- Date_Format() ： 格式化日期时间
+- Day() ： 返回日期的天数
+- Month() ： 返回日期的月份
+- Year() ： 返回日期的年份
+- DayOfWeek() ： 返回日期的星期几
+- Hour() ： 返回时间的小时
+- Minute() ： 返回时间的分钟
+- Second() ： 返回时间的秒数
+### 数学函数
+- Abs(): 返回一个数的绝对值
+- Cos(): 返回一个数的余弦值
+- Sin(): 返回一个数的正弦值
+- Tan(): 返回一个数的正切值
+- Exp(): 返回一个数的指数值
+- Mod(): 返回一个数的余数
+- Pi(): 返回圆周率
+- Rand(): 返回一个随机数
+- Sqrt(): 返回一个数的平方根
+
+## 第12章 汇总数据
+
+- AVG() ： 返回一个列的平均值
+- COUNT() ： 返回一个列的行数  COUNT(*)：返回所有行数  COUNT(列名)：返回非NULL值的行数
+- Max() ： 返回一个列的最大值
+- Min() ： 返回一个列的最小值
+- SUM() ： 返回一个列的总和
+```sql
+SELECT AVG(prod_price) AS avg_price FROM products; # 返回所有产品的的平均价格
+SELECT COUNT(*) AS num_products FROM products; # 返回所有产品的行数
+SELECT MAX(prod_price) AS max_price FROM products; # 返回所有产品的最大价格
+SELECT MIN(prod_price) AS min_price FROM products; # 返回所有产品的最小价格
+SELECT SUM(prod_price) AS total_price_sum FROM products; # 返回所有产品的总和
+```
